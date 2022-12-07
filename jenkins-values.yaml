@@ -19,7 +19,7 @@ controller:
   # Used for label app.kubernetes.io/component
   componentName: "jenkins-controller"
   image: "jenkins/jenkins"
-  # tag: "2.346.3-jdk11"
+  # tag: "2.361.2-jdk11"
   tagLabel: jdk11
   imagePullPolicy: "Always"
   imagePullSecretName:
@@ -64,8 +64,8 @@ controller:
   #   - --httpPort=8080
   resources:
     requests:
-      cpu: "50m"
-      memory: "256Mi"
+      cpu: "1000m"
+      memory: "512Mi"
     limits:
       cpu: "2000m"
       memory: "4096Mi"
@@ -240,16 +240,16 @@ controller:
 
   # List of plugins to be install during Jenkins controller start
   installPlugins:
-    - kubernetes:3600.v144b_cd192ca_a_
-    - workflow-aggregator:581.v0c46fa_697ffd
-    - git:4.11.3
-    - configuration-as-code:1429.v09b_044a_c93de
+    - kubernetes:3706.vdfb_d599579f3
+    - workflow-aggregator:590.v6a_d052e5a_a_b_5
+    - git:4.11.5
+    - configuration-as-code:1569.vb_72405b_80249
 
   # Set to false to download the minimum required version of all dependencies.
   installLatestPlugins: true
 
   # Set to true to download latest dependencies of any plugin that is requested to have the latest version.
-  installLatestSpecifiedPlugins: false
+  installLatestSpecifiedPlugins: true
 
   # List of plugins to install in addition to those listed in controller.installPlugins
   additionalPlugins: []
@@ -402,7 +402,8 @@ controller:
   # Node labels and tolerations for pod assignment
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#taints-and-tolerations-beta-feature
-  nodeSelector: {}
+  nodeSelector:
+    kubernetes.io/arch: amd64
 
   terminationGracePeriodSeconds:
 
@@ -460,10 +461,14 @@ controller:
   # A secondary ingress will let you expose different urls
   # with a differnt configuration
   secondaryingress:
-    enabled: false
+    enabled: true
     # paths you want forwarded to the backend
     # ex /github-webhook
-    paths: []
+    paths:
+      - /github-webhook/
+      - /github-webhook
+      - /multibranch-webhook-trigger/invoke/
+      - /multibranch-webhook-trigger/invoke
     # For Kubernetes v1.14+, use 'networking.k8s.io/v1beta1'
     # For Kubernetes v1.19+, use 'networking.k8s.io/v1'
     apiVersion: "extensions/v1beta1"
@@ -475,7 +480,7 @@ controller:
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
     # ingressClassName: nginx
     # configures the hostname e.g. jenkins-external.example.com
-    hostName:
+    hostName: jenkins.best-pool.net
     tls:
     # - secretName: jenkins-external.example.com
     #   hosts:
@@ -679,7 +684,9 @@ agent:
   envVars: []
   # - name: PATH
   #   value: /usr/local/bin
-  nodeSelector: {}
+  nodeSelector:
+    kubernetes.io/arch: amd64
+
   # Key Value selectors. Ex:
   # jenkins-agent: v1
 
@@ -691,7 +698,7 @@ agent:
   # Doesn't allocate pseudo TTY by default
   TTYEnabled: false
   # Max number of spawned agent
-  containerCap: 10
+  containerCap: 100
   # Pod name
   podName: "default"
   # Allows the Pod to remain active for reuse until the configured number of
@@ -777,16 +784,16 @@ persistence:
   ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
   ##   GKE, AWS & OpenStack)
   ##
-  storageClass: nfs
-  annotations: {}
-  labels: {}
-  accessMode: "ReadWriteOnce"
-  size: "8Gi"
-  volumes:
+  # storageClass: nfs
+  # annotations: {}
+  # labels: {}
+  # accessMode: "ReadWriteOnce"
+  # size: "8Gi"
+  # volumes:
   #  - name: nothing
   #    emptyDir: {}
-  mounts:
-  #  - mountPath: /var/nothing
+  # mounts:
+  # #  - mountPath: /var/nothing
   #    name: nothing
   #    readOnly: true
 

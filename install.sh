@@ -5,9 +5,16 @@ function get_password() {
 }
 
 function install() {
-    helm install jenkins -n jenkins -f 05-values.yaml $chart
+    sudo helm repo add jenkinsci https://charts.jenkins.io
+    sudo helm repo update
+    chart="jenkinsci/jenkins"
+    sudo helm install jenkins -n jenkins -f jenkins-values.yaml $chart
 }
 
 function uninstall() {
-    helm uninstall jenkinsci -n jenkins
+    helm uninstall jenkins -n jenkinsci/jenkins
+}
+
+function upgrade() {
+    helm upgrade -f jenkins-values.yaml jenkins jenkinsci/jenkins
 }
